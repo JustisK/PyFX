@@ -1,6 +1,5 @@
 import os, sys, re
 import numpy as np
-import pandas as pd
 import skimage.io
 import skimage.transform
 from sklearn.preprocessing import LabelBinarizer
@@ -8,15 +7,13 @@ from keras.applications import InceptionV3
 from keras.applications import imagenet_utils
 from keras.models import Model
 from keras.layers import Input, Dense, Flatten, Dropout, Reshape
-from keras import backend as K
-from sklearn.externals import joblib
 
 def extract_features():
 
     # Load dataset (any image-based dataset)
     matches = [(re.match(r'^(([a-zA-Z]+)\d+\.png)', fname), path) 
-	    for path, dirs, files in os.walk('./datasets/ucm') for fname in files]
-    patches = [skimage.transform.resize( # resize image to (256, 256) TODO argv param based on patch size
+	    for path, dirs, files in os.walk('./datasets/ucm') for fname in files] # TODO argv directory
+    patches = [skimage.transform.resize( # resize image to (256, 256) TODO argv patch size?
 	    skimage.io.imread(os.path.join(path, match.group(1))), # open each image
     	    (256, 256)) for match, path in matches if match]
 	
@@ -43,5 +40,5 @@ def extract_features():
     return features
 
 features = extract_features()
-print("\n[INFO] Output array shape:", features.shape)
-np.savetxt('np_test.csv', features, delimiter=',')
+# print("\n[INFO] Output array shape:", features.shape)
+np.savetxt('features.csv', features, fmt='%f') # TODO argv filename
