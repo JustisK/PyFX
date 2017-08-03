@@ -7,13 +7,15 @@ from sklearn.preprocessing import LabelBinarizer
 from keras.applications import InceptionV3
 from keras.applications import imagenet_utils
 from keras.models import Model
-from keras.layers import Input, Dense, Output, Flatten, Dropout
+from keras.layers import Input, Dense, Flatten, Dropout, Reshape
+from keras import backend as K
+from sklearn.externals import joblib
 
 def extract_features():
 
     # Load dataset (any image-based dataset)
     matches = [(re.match(r'^(([a-zA-Z]+)\d+\.png)', fname), path) 
-	    for path, dirs, files in os.walk('../') for fname in files]
+	    for path, dirs, files in os.walk('./datasets/ucm') for fname in files]
     patches = [skimage.transform.resize( # resize image to (256, 256) TODO argv param based on patch size
 	    skimage.io.imread(os.path.join(path, match.group(1))), # open each image
     	    (256, 256)) for match, path in matches if match]
@@ -25,17 +27,21 @@ def extract_features():
     print('patches', patches[0].shape, len(patches), 'labels', len(labels))
 
     # Construct model (using ImageNet weights)
-    self.inceptionV3 = InceptionV3(weights = "imagenet", include_top = False, 
-        pooling = avg, input_shape = patches[0].shape)
+    inceptionV3 = InceptionV3(weights = "imagenet", include_top = False, 
+        input_shape = patches[0].shape)
 	
-    for layer in inceptionV3.layers:
-        layer.trainable = False
+    #for layer in inceptionV3.layers:
+    #    layer.trainable = False
 
-    x = inceptionV3.outputs
+    x = inceptionV3.output
     x = Flatten()(x)
     x = Dense(1024, activation="relu")(x)
     x = Dropout(0.5)(x)
     x = Dense(1024, activation="relu")(x)
-    
-    # actual feature extraction
-    features = inceptionV3.predict(x, batch_size=1)
+    extractor = Model(inputs=[inceptionV3.input],outputs=[x])
+    features = extractor.predict(x=patches, batch_size=2)
+    return features
+
+features = extract_features()
+print("\n[INFO] Output array shape:", features.shape)
+np.savetxt('np_test.csv', features, delimiter=',')
