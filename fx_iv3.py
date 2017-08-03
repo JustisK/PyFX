@@ -16,15 +16,15 @@ def extract_features():
 	    for path, dirs, files in os.walk('../') for fname in files]
     patches = [skimage.transform.resize( # resize image to (256, 256) TODO argv param based on patch size
 	    skimage.io.imread(os.path.join(path, match.group(1))), # open each image
-    	(256, 256)) for match, path in matches if match]
+    	    (256, 256)) for match, path in matches if match]
 	
-	# change color channel order and shift mean color for ImageNet		
+    # change color channel order and shift mean color for ImageNet		
     patches = imagenet_utils.preprocess_input(np.array(patches)) 
     labels = [match.group(2) for match, path in matches if match]
     labels = LabelBinarizer().fit_transform(list(labels)) # one-hot encoding
     print('patches', patches[0].shape, len(patches), 'labels', len(labels))
 
-	# Construct model (using ImageNet weights)
+    # Construct model (using ImageNet weights)
     self.inceptionV3 = InceptionV3(weights = "imagenet", include_top = False, 
         pooling = avg, input_shape = patches[0].shape)
 	
