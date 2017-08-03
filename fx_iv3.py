@@ -29,7 +29,7 @@ def extract_features():
         pooling = avg, input_shape = patches[0].shape)
 	
     for layer in inceptionV3.layers:
-	    layer.trainable = False
+        layer.trainable = False
 
     x = inceptionV3.outputs
     x = Flatten()(x)
