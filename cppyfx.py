@@ -8,11 +8,15 @@ from keras.applications import imagenet_utils
 from keras.models import Model
 from keras.layers import Input, Dense, Flatten, Dropout, Reshape
 
+# Command line arguments: image in-path, feature out-path, .extension for output
+argv = sys.argv
+img_path, out_path, ext = argv[1], argv[2], argv[3]
+
 def extract_features():
 
     # Load dataset (any image-based dataset)
     matches = [(re.match(r'^(([a-zA-Z]+)\d+\.png)', fname), path) 
-	    for path, dirs, files in os.walk('./datasets/ucm') for fname in files] # TODO argv directory
+	    for path, dirs, files in os.walk('./datasets/ucm') for fname in files]
     patches = [skimage.transform.resize( # resize image to (256, 256) TODO argv patch size?
 	    skimage.io.imread(os.path.join(path, match.group(1))), # open each image
     	    (256, 256)) for match, path in matches if match]
@@ -41,4 +45,4 @@ def extract_features():
 
 features = extract_features()
 # print("\n[INFO] Output array shape:", features.shape)
-np.savetxt('features.csv', features, fmt='%f') # TODO argv filename
+np.savetxt("" + out_path + ext, features, fmt='%f')
