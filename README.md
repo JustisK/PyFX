@@ -17,6 +17,11 @@ As of now, the script uses an 'unsafe' implementation, assuming correct input fo
  * Include **all** parameters.
 Failure to follow these guidelines will result in program failure and (potentially) corrupted output. Moreover, suitability checks aren't yet performed prior to initializing the model, so the program will spend a fair amount of time walking through the image directory before throwing any errors.
 
+### Example invocation
+`python pyfx.py ./data/images ./output/fname csv`
+
+Reads images from {execution directory}/data/images, outputs to {execution directory}/output in a file named `fname.csv`.
+
 ## License
 The software is MIT-licensed.
 
