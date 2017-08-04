@@ -45,4 +45,4 @@ def extract_features():
 
 features = extract_features()
 # print("\n[INFO] Output array shape:", features.shape)
-np.savetxt("" + out_path + ext, features, fmt='%f')
+np.savetxt("" + out_path + "." + ext, features, fmt='%f')
