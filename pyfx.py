@@ -9,22 +9,26 @@ from keras.applications import imagenet_utils
 from keras.models import Model
 from keras.layers import Input, Dense, Flatten, Dropout, Reshape
 
-# Command line arguments: image in-path, feature out-path, .extension for output
+# Command line arguments: image in-path, feature out-path, extension for output
 parser = argparse.ArgumentParser(description='Perform InceptionV3-ImageNet feature extraction on images.')
-parser.add_argument('strings', metavar='img_path, out_path, or extension', type=str, nargs='+',
-	                help='a string (either directory or file extension)', action='append')
 
+"""parser.add_argument('strings', metavar='img_path, out_path, or extension', type=str, nargs='+',
+	                help='a string (either directory or file extension)', action='append')
+"""
+# DEFAULTS
 img_path = "./images"
 out_path = "./output/features"
 ext = "csv"
-opts = parser.parse_args()
 
-if opts[0]:
-    img_path = opts[0]
-if opts[1]:
-    out_path = opts[1]
-if opts[2]:
-    ext = opts[2]
+parser.add_argument('infile', nargs='?', type=argparse.FileType('r'), 
+                    default='./images', action='append')
+parser.add_argument('outfile', nargs='?', type=argparse.FileType('w'), 
+                    default='./output/features', action='append')
+parser.add_argument('extension', nargs='?', type=argparse.FileType('w'), 
+                    default='csv', action='append')
+opts = parser.parse_args([])
+
+
 
 
 def extract_features():
