@@ -15,8 +15,14 @@ parser = argparse.ArgumentParser(description='Perform InceptionV3-ImageNet featu
 img_path = "./images"
 out_path = "./output/features"
 ext = "csv"
+opts = parser.parse_args()
 
-img_path, out_path, ext = argv[1], argv[2], argv[3]
+if opts[0]:
+    img_path = opts[0]
+if opts[1]:
+    out_path = opts[1]
+if opts[2]:
+    ext = opts[2]
 
 def extract_features():
 
