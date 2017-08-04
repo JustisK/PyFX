@@ -39,7 +39,7 @@ def extract_features():
     extractor = Model(inputs=[inceptionV3.input],outputs=[x])
     features = extractor.predict(x=patches, batch_size=2)
     return features
-
+# this is a comment
 features = extract_features()
 # print("\n[INFO] Output array shape:", features.shape) # Uncomment to verify output shape
 np.savetxt("" + str(out_path) + "." + str(ext), features, fmt='%f')
