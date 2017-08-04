@@ -16,7 +16,7 @@ def extract_features():
 
     # Load dataset (any image-based dataset)
     matches = [(re.match(r'^(([a-zA-Z]+)\d+\.png)', fname), path) 
-	    for path, dirs, files in os.walk('./datasets/ucm') for fname in files]
+	    for path, dirs, files in os.walk(''+str(img_path)) for fname in files]
     patches = [skimage.transform.resize( # resize image to (256, 256) TODO argv patch size?
 	    skimage.io.imread(os.path.join(path, match.group(1))), # open each image
     	    (256, 256)) for match, path in matches if match]
@@ -30,9 +30,6 @@ def extract_features():
     # Construct model (using ImageNet weights)
     inceptionV3 = InceptionV3(weights = "imagenet", include_top = False, 
         input_shape = patches[0].shape)
-	
-    #for layer in inceptionV3.layers:
-    #    layer.trainable = False
 
     x = inceptionV3.output
     x = Flatten()(x)
@@ -44,5 +41,5 @@ def extract_features():
     return features
 
 features = extract_features()
-# print("\n[INFO] Output array shape:", features.shape)
-np.savetxt("" + out_path + "." + ext, features, fmt='%f')
+# print("\n[INFO] Output array shape:", features.shape) # Uncomment to verify output shape
+np.savetxt("" + str(out_path) + "." + str(ext), features, fmt='%f')
