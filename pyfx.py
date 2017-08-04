@@ -1,4 +1,5 @@
 import os, sys, re
+import argparse
 import numpy as np
 import skimage.io
 import skimage.transform
@@ -9,7 +10,12 @@ from keras.models import Model
 from keras.layers import Input, Dense, Flatten, Dropout, Reshape
 
 # Command line arguments: image in-path, feature out-path, .extension for output
-argv = sys.argv
+parser = argparse.ArgumentParser(description='Perform InceptionV3-ImageNet feature extraction on images.')
+
+img_path = "./images"
+out_path = "./output/features"
+ext = "csv"
+
 img_path, out_path, ext = argv[1], argv[2], argv[3]
 
 def extract_features():
