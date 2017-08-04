@@ -11,6 +11,8 @@ from keras.layers import Input, Dense, Flatten, Dropout, Reshape
 
 # Command line arguments: image in-path, feature out-path, .extension for output
 parser = argparse.ArgumentParser(description='Perform InceptionV3-ImageNet feature extraction on images.')
+parser.add_argument('strings', metavar='img_path, out_path, or extension', type=str, nargs='+',
+	                help='a string (either directory or file extension)', action='append')
 
 img_path = "./images"
 out_path = "./output/features"
@@ -23,6 +25,7 @@ if opts[1]:
     out_path = opts[1]
 if opts[2]:
     ext = opts[2]
+
 
 def extract_features():
 
