@@ -15,27 +15,20 @@ parser = argparse.ArgumentParser(description='Perform InceptionV3-ImageNet featu
 """parser.add_argument('strings', metavar='img_path, out_path, or extension', type=str, nargs='+',
 	                help='a string (either directory or file extension)', action='append')
 """
-# DEFAULTS
-img_path = "./images"
-out_path = "./output/features"
-ext = "csv"
 
-parser.add_argument('infile', nargs='?', type=argparse.FileType('r'), 
-                    default='./images', action='append')
-parser.add_argument('outfile', nargs='?', type=argparse.FileType('w'), 
-                    default='./output/features', action='append')
-parser.add_argument('extension', nargs='?', type=argparse.FileType('w'), 
-                    default='csv', action='append')
-opts = parser.parse_args([])
-
-
-
+parser.add_argument(nargs='?', type=str, dest='img_path',
+                    default='./images', action='store')
+parser.add_argument(nargs='?', type=str, dest='out_path',
+                    default='./output/features', action='store')
+parser.add_argument(nargs='?', type=str, dest='ext',
+                    default='csv', action='store')
+args = parser.parse_args()
 
 def extract_features():
 
     # Load dataset (any image-based dataset)
     matches = [(re.match(r'^(([a-zA-Z]+)\d+\.png)', fname), path) 
-	    for path, dirs, files in os.walk(''+str(img_path)) for fname in files]
+	    for path, dirs, files in os.walk(''+str(args.img_path)) for fname in files]
     patches = [skimage.transform.resize( # resize image to (256, 256) TODO argv patch size?
 	    skimage.io.imread(os.path.join(path, match.group(1))), # open each image
     	    (256, 256)) for match, path in matches if match]
@@ -61,4 +54,4 @@ def extract_features():
 
 features = extract_features()
 # print("\n[INFO] Output array shape:", features.shape) # Uncomment to verify output shape
-np.savetxt("" + str(out_path) + "." + str(ext), features, fmt='%f')
+np.savetxt("" + str(args.out_path) + "." + str(args.ext), features, fmt='%f')
