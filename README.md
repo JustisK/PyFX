@@ -6,7 +6,7 @@ As a standard Python script, `PyFX` can be run from terminal or invoked using `s
 
 ### Arguments
 `PyFX` takes four arguments: 
- * an input path (e.g. directory containing images and/or image-holding subdirectories) - default is './images' 
+ * an input path (e.g. directory containing images [for extract_multi()] or the address of a single image [for extract_single()]) - default is './images' 
  * an output  path (e.g. directory and filename) - default is './output/features'
  * a **DOTLESS** file extension (e.g. "csv", "txt") for the stored features - default is 'hdf5'
  * a Python-style boolean - True for compressed output, False for uncompressed - default is True
