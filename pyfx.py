@@ -93,7 +93,8 @@ else:
 	if args.compressed == True:
 		extension += ".gz"
 	fname = "" + str(args.out_path) + "." + extension
-	np.savetxt(fname=fname, X=features, fmt='%1.6f') # %fmt is broken?
+	np.savetxt(fname=fname, X=features, fmt='%1.6f')
+
 # TODO: npz for the optional list of concat. 1d arrays
 # END HARD CODED TEST STUFF
 
