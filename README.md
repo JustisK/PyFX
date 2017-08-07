@@ -14,7 +14,6 @@ As a standard Python script, `PyFX` can be run from terminal or invoked using `s
 As of now, the script uses an 'unsafe' implementation, assuming correct input format for the target images and command line arguments. When using `PyFX`:
  * Do not put quotation marks around parameters.
  * Do not put '.' before the file extension parameter. 
- * Include **all** parameters.
 Failure to follow these guidelines will result in program failure and (potentially) corrupted output. Moreover, suitability checks aren't yet performed prior to initializing the model, so the program will spend a fair amount of time walking through the image directory before throwing any errors.
 
 ### Example invocation
