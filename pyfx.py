@@ -58,7 +58,6 @@ def extract_multi():
     # TODO: get rid of zero-padding
     # TODO: concatenate individual patches to individual 1d arrays?
     
-
     return features
 
 # HARD CODED TEST STUFF BELOW
