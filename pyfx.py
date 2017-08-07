@@ -24,6 +24,10 @@ parser.add_argument(nargs='?', type=bool, dest='compressed',
 					default=True, action='store')
 args = parser.parse_args()
 
+"""
+Extracts feature data for each member in a directory containing .png images,
+then stores them in a user-selected file format (by default, hdf5).
+"""
 def extract_multi():
 
     # Load dataset (any image-based dataset)
@@ -59,6 +63,19 @@ def extract_multi():
     # TODO: concatenate individual patches to individual 1d arrays?
     
     return features
+
+"""
+Returns feature data for a single image or patch. Intended as a helper
+method for an extract_multi() variant that returns 1d arrays of feature
+data for each member in a list of images - but, can be used explicitly.
+
+Those intending to use this method directly might consider libkeras's
+extract_features.py as an alternative.
+"""
+def extract_single():
+
+	target = image.load_img(args.img_path)
+
 
 # HARD CODED TEST STUFF BELOW
 features = extract_multi()
