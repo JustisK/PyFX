@@ -27,11 +27,10 @@ args = parser.parse_args()
 def extract_features():
 
     # Load dataset (any image-based dataset)
-    matches = [(re.match(r'^(([a-zA-Z]+)\d+\.png)', fname), path) 
-	    for path, dirs, files in os.walk(''+str(args.img_path)) for fname in files]
+    matches = [(re.match(r'^(([a-zA-Z]+)\d+\.png)', fname), path) for path, dirs, files in os.walk(''+str(args.img_path)) for fname in files]
     patches = [skimage.transform.resize( # resize image to (256, 256) TODO argv patch size?
-	    skimage.io.imread(os.path.join(path, match.group(1))), # open each image
-    	    (256, 256)) for match, path in matches if match]
+    	skimage.io.imread(os.path.join(path, match.group(1))), # open each image
+	    (256, 256)) for match, path in matches if match]
 	
     # change color channel order and shift mean color for ImageNet		
     patches = imagenet_utils.preprocess_input(np.array(patches)) 
