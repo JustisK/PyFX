@@ -5,10 +5,11 @@ Inception-based feature extraction for image-based datasets. Written in Python3.
 As a standard Python script, `PyFX` can be run from terminal or invoked using `system()` within C++ (or equivalent modes of shell interaction). 
 
 ### Arguments
-`PyFX` takes three arguments: 
- * an input path (e.g. directory containing images and/or image-holding subdirectories), 
- * an output  path (e.g. directory and filename), 
- * and a file extension (e.g. "csv", "txt") for the stored features.
+`PyFX` takes four arguments: 
+ * an input path (e.g. directory containing images and/or image-holding subdirectories) - default is './images' 
+ * an output  path (e.g. directory and filename) - default is './output/features'
+ * a **DOTLESS** file extension (e.g. "csv", "txt") for the stored features - default is 'hdf5'
+ * a Python-style boolean - True for compressed output, False for uncompressed - default is True
 
 ### Usage notes
 As of now, the script uses an 'unsafe' implementation, assuming correct input format for the target images and command line arguments. When using `PyFX`:
@@ -25,4 +26,4 @@ Reads images from {execution directory}/data/images, outputs to {execution direc
 The software is MIT-licensed.
 
 ## Credit/Thanks
-Thanks to @aleozlx (Alex Yang) for model design (used in transfer learning exercise elsewhere).
+Thanks to @aleozlx (Alex Yang) for top-level model design (used in transfer learning exercise elsewhere).
