@@ -14,19 +14,17 @@ from keras.layers import Input, Dense, Flatten, Dropout, Reshape
 # Command line arguments: image in-path, feature out-path, extension for output
 parser = argparse.ArgumentParser(description='Perform InceptionV3-ImageNet feature extraction on images.')
 
-"""parser.add_argument('strings', metavar='img_path, out_path, or extension', type=str, nargs='+',
-	                help='a string (either directory or file extension)', action='append')
-"""
-
 parser.add_argument(nargs='?', type=str, dest='img_path',
                     default='./images', action='store')
 parser.add_argument(nargs='?', type=str, dest='out_path',
                     default='./output/features', action='store')
-#parser.add_argument(nargs='?', type=str, dest='ext',
-                    #default='csv', action='store')
+parser.add_argument(nargs='?', type=str, dest='ext',
+                    default='csv', action='store')
+parser.add_argument(nargs='?', type=bool, dest='compressed',
+					default=True, action='store')
 args = parser.parse_args()
 
-def extract_features():
+def extract_multi():
 
     # Load dataset (any image-based dataset)
     matches = [(re.match(r'^(([a-zA-Z]+)\d+\.png)', fname), path) 
@@ -46,14 +44,6 @@ def extract_features():
     # Isolate pre-softmax outputs
     x = inceptionV3.output
 
-    """
-    # Fluff
-    x = Flatten()(x)
-    x = Dense(1024, activation='relu')(x)
-    x = Dropout(0.5)(x)
-    x = Dense(1024, activation='relu')(x)
-	"""
-
     # Construct extractor model
     extractor = Model(inputs=[inceptionV3.input], outputs=[x])
 
@@ -65,12 +55,25 @@ def extract_features():
 
     return features
 
-features = extract_features()
-# save by pickling (not recommended):
-# np.save(file=str(args.out_path), allow_pickle=True, arr=features)
+# HARD CODED TEST STUFF BELOW
 
-# (Recommended) save --> .hdf
-f = h5py.File(""+str(args.out_path)+".hdf5", "w")
-hdf = f.create_dataset(name=str(args.out_path), data=features)
+features = extract_multi()
 
+# END HARD CODED TEST STUFF
+
+extension = str(args.ext)
+
+
+if extension is "hdf":
+	# (Recommended, default) save --> .hdf
+	f = h5py.File(""+str(args.out_path)+".hdf5", "w")
+	hdf = f.create_dataset(name=str(args.out_path), data=features)
+elif extension is "npy":
+	fname = "" + str(args.out_path)
+	np.save(file=fname, allow_pickle=True, arr=features)
+else:
+	if args.compressed is True:
+		extension += ".gz"
+	fname = "" + str(args.out_path) + "." + extension
+	np.savetxt(fname=fname, X=features, delimiter=',') # %fmt is broken?
 import gc; gc.collect()
