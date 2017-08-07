@@ -1,11 +1,12 @@
 import os, sys, re
 import argparse
 import numpy as np
+import common
 import skimage.io
 import skimage.transform
 from sklearn.preprocessing import LabelBinarizer
 from keras.applications import InceptionV3
-from keras.applications import imagenet_utils
+from keras.preprocessing import image
 from keras.models import Model
 from keras.layers import Input, Dense, Flatten, Dropout, Reshape
 
@@ -28,29 +29,33 @@ def extract_features():
 
     # Load dataset (any image-based dataset)
     matches = [(re.match(r'^(([a-zA-Z]+)\d+\.png)', fname), path) for path, dirs, files in os.walk(''+str(args.img_path)) for fname in files]
-    patches = [skimage.transform.resize( # resize image to (256, 256) TODO argv patch size?
+    patches = [skimage.transform.resize( # resize image to (256, 256)
     	skimage.io.imread(os.path.join(path, match.group(1))), # open each image
 	    (256, 256)) for match, path in matches if match]
-	
-    # change color channel order and shift mean color for ImageNet		
-    patches = imagenet_utils.preprocess_input(np.array(patches)) 
-    labels = [match.group(2) for match, path in matches if match]
-    labels = LabelBinarizer().fit_transform(list(labels)) # one-hot encoding
-    print('patches', patches[0].shape, len(patches), 'labels', len(labels))
+   
+   # Preprocess for InceptionV3	
+    for img in patches:
+    	img = np.expand_dims(img, axis=0)
+    	img = InceptionV3.preprocess_input(img)
 
     # Construct model (using ImageNet weights)
     inceptionV3 = InceptionV3(weights = "imagenet", include_top = False, 
         input_shape = patches[0].shape)
 
     x = inceptionV3.output
-    x = Flatten()(x)
-    x = Dense(1024, activation="relu")(x)
-    x = Dropout(0.5)(x)
-    x = Dense(1024, activation="relu")(x)
+
+    # Construct extractor model
     extractor = Model(inputs=[inceptionV3.input],outputs=[x])
+
+    # Extract features with Model.predict()
     features = extractor.predict(x=patches, batch_size=2)
+
+    # Concatenate features to 1d array
+    features = np.ndarray.flatten(features)
+
     return features
 
 features = extract_features()
-# print("\n[INFO] Output array shape:", features.shape) # Uncomment to verify output shape
 np.savetxt("" + str(args.out_path) + "." + str(args.ext), features, fmt='%f')
+
+import gc; gc.collect()
