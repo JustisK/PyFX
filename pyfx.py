@@ -21,6 +21,8 @@ def collect_args():
 
     # TODO: nargs, document these - explain each type
     # TODO: case-insensitivity changes
+    parser.add_argument(nargs='?', type=str, dest='extractor',
+                        default='multi', action='store')
     parser.add_argument(nargs='?', type=str, dest='img_path',
                         default='./images', action='store')
     parser.add_argument(nargs='?', type=str, dest='out_path',
@@ -29,9 +31,8 @@ def collect_args():
                         default='hdf5', action='store')
     parser.add_argument(nargs='?', type=bool, dest='compressed',
                         default=False, action='store')
-    parser.add_argument(nargs='?', type=str, dest='extractor',
-                        default='multi', action='store')
-
+    parser.add_argument(nargs='?', type=bool, dest='flatten',
+                        default=False, action='store')
     argv = parser.parse_args()
     compressed = argv.compressed
     extension = argv.ext
@@ -74,8 +75,8 @@ def extract_multi():
     # Isolate pre-softmax outputs
     x = inception.output
 
-    # Experimental - flatten to 2d for CSV
-    if args.ext == "csv":
+    # Experimental - flatten to 1d for CSV
+    if args.flatten or args.ext == 'csv':
         x = Flatten()(x)
 
     # Construct extractor model
@@ -105,7 +106,7 @@ def extract_single():
     """
 
     # Load target image
-    target = skimage.io.imread(args.img_path).astype('float64')
+    target = skimage.io.imread(args.img_path).astype('float32')
     # TODO: patch overlap
     patches = extract_patches_2d(target, (256, 256))
 
@@ -125,8 +126,8 @@ def extract_single():
     # Isolate pre-softmax outputs
     x = inception.output
 
-    # Experimental - flatten to 2d for CSV
-    if args.ext == "csv":
+    # Experimental - flatten to 1d
+    if args.flatten or args.ext == 'csv':
         x = Flatten()(x)
 
     # Construct extractor model
@@ -169,7 +170,7 @@ def save_features():
     print(features.shape)  # comment out if you don't care to know output shape
 
     extension = str(args.ext)
-    compressed = args.compressed
+    compress = args.compressed
     out_path = str(args.out_path)
     # TODO: figure out compression for file types other than txt/csv
 
@@ -181,7 +182,7 @@ def save_features():
         outfile = "" + out_path
         np.save(file=outfile, allow_pickle=True, arr=features)
     else:
-        if compressed:
+        if compress:
             extension += ".gz"
         outfile = "" + out_path + "." + extension
         np.savetxt(fname=outfile, X=features, fmt='%1.6f')
