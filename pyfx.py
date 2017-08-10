@@ -29,12 +29,14 @@ if (args.ext != "csv") and args.compressed:
     \nOutput will not be compressed.""")
 
 """
-Extracts feature data for each member in a directory containing .png images,
-then stores them in a user-selected file format (by default, hdf5).
+extract_multi
+
+Extracts feature data for each member in a directory containing .png images.
 """
 
 def extract_multi():
     # Load dataset (any image-based dataset)
+    # TODO: argv for file types other than png
     matches = [(re.match(r'^(([a-zA-Z]+)\d+\.png)', fname), path)
                for path, dirs, files in os.walk('' + str(args.img_path))
                for fname in files]
@@ -55,7 +57,6 @@ def extract_multi():
     # Experimental - flatten to 2d for CSV
     if args.ext == "csv":
         x = Flatten()(x)
-        x = Dropout(0.5)(x)
 
     # Construct extractor model
     extractor = Model(inputs=[inceptionV3.input], outputs=[x])
@@ -70,6 +71,8 @@ def extract_multi():
 
 
 """
+extract_single_1d
+
 Returns feature data for a single image or patch. Intended as a helper
 method for an extract_multi() variant that returns 1d arrays of feature
 data for each member in a list of images - but, can be used explicitly.
@@ -81,6 +84,13 @@ extract_features.py as an alternative.
 
 def extract_single_1d():
     target = image.load_img(args.img_path)
+
+"""
+extract_single
+
+Returns feature data for a single image or patch. Does not concatenate
+output to a 1d array, but instead outputs a full Keras tensor.
+"""
 
 
 def extract_single():
@@ -102,7 +112,6 @@ def save_features():
         outfile = "" + str(args.out_path)
         np.save(file=outfile, allow_pickle=True, arr=features)
     else:
-        # TODO: add Flatten()(features) layer --> reduce to 2d array
         if args.compressed:
             extension += ".gz"
         outfile = "" + str(args.out_path) + "." + extension
