@@ -83,6 +83,7 @@ def save_features():
     features = extract_multi()
     print(features.shape)
     extension = str(args.ext)
+    # TODO: figure out compression for file types other than txt/csv
     if extension == "hdf5":
         # (Recommended, default) save --> .hdf
         f = h5py.File("" + str(args.out_path) + ".hdf5", "w")
