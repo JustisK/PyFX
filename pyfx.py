@@ -20,8 +20,13 @@ parser.add_argument(nargs='?', type=str, dest='out_path',
 parser.add_argument(nargs='?', type=str, dest='ext',
                     default='hdf5', action='store')
 parser.add_argument(nargs='?', type=bool, dest='compressed',
-                    default=True, action='store')
+                    default=False, action='store')
 args = parser.parse_args()
+
+# TODO: put this warning somewhere else
+if (args.ext != "csv") and args.compressed:
+    print("""WARNING: non-text output (bin, npy, hdf5) is incompressible for now.
+    \nOutput will not be compressed.""")
 
 """
 Extracts feature data for each member in a directory containing .png images,
@@ -74,15 +79,20 @@ extract_features.py as an alternative.
 """
 
 
-def extract_single():
+def extract_single_1d():
     target = image.load_img(args.img_path)
 
 
+def extract_single():
+    target = image.load_image(args.img_path)
+
+
 def save_features():
-    # HARD CODED TEST STUFF BELOW
     features = extract_multi()
-    print(features.shape)
+    print(features.shape) # comment out if you don't care to know output shape
+
     extension = str(args.ext)
+    compressed = args.compressed
     # TODO: figure out compression for file types other than txt/csv
     if extension == "hdf5":
         # (Recommended, default) save --> .hdf
@@ -97,8 +107,7 @@ def save_features():
             extension += ".gz"
         outfile = "" + str(args.out_path) + "." + extension
         np.savetxt(fname=outfile, X=features, fmt='%1.6f')
-    # TODO: npz for the optional list of concat. 1d arrays
-    # END HARD CODED TEST STUFF
+    # TODO: (distant future) npz for the optional list of concat. 1d arrays
 
 save_features()
 import gc; gc.collect()
