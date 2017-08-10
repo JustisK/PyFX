@@ -67,6 +67,7 @@ def extract_multi():
     matches = [(re.match(r'^(([a-zA-Z]+)\d+\.png)', fname), path)
                for path, dirs, files in os.walk('' + str(args.img_path))
                for fname in files]
+    # Resize / regularize image 'patches'
     patches = [skimage.transform.resize(  # resize image to (256, 256)
         skimage.io.imread(os.path.join(path, match.group(1))),  # open each image
         (256, 256)) for match, path in matches if match]
@@ -140,11 +141,13 @@ def extract_single():
         x = Flatten()(x)
         # TODO: K.reshape(x) to 2d
 
+
     # Construct extractor model
     extractor = Model(inputs=[inception.input], outputs=[x])
 
     # Extract features with Model.predict()
     features = extractor.predict(x=patches, batch_size=2)
+    features = K.reshape(features, (72, 1024))
     # TODO: get rid of zero-padding
 
     return features
