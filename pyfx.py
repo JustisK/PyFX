@@ -1,15 +1,47 @@
-import os, re, gc, argparse
+"""
+PyFX v0.1
+-------------------
+MIT License
+
+Copyright (c) 2017 Keegan T. O. Justis
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+"""
+
+import os
+import re
+import gc
+import argparse
+
 import numpy as np
 import h5py
+
 import skimage.io
 import skimage.transform
 from sklearn.feature_extraction.image import extract_patches_2d
-from keras import backend as K
+
 from keras.applications import InceptionV3
 from keras.applications.imagenet_utils import preprocess_input
 from keras.preprocessing import image
 from keras.models import Model
-from keras.layers import Dropout, Flatten, Input
+from keras.layers import Flatten
+from keras import backend as K
 
 
 def collect_args():
@@ -72,12 +104,12 @@ def extract_multi():
         skimage.io.imread(os.path.join(path, match.group(1))),  # open each image
         (256, 256)) for match, path in matches if match]
 
-    # Preprocess for InceptionV3	
+    # Pre-process for InceptionV3
     patches = preprocess_input(np.array(patches))
 
     # Construct model (using ImageNet weights)
     inception = InceptionV3(weights="imagenet", include_top=False,
-                              input_shape=patches[0].shape)
+                            input_shape=patches[0].shape)
 
     # Isolate pre-softmax outputs
     x = inception.output
@@ -126,12 +158,12 @@ def extract_single():
     
     """
 
-    # Preprocess for InceptionV3
+    # Pre-process for InceptionV3
     patches = preprocess_input(np.array(patches))
 
     # Construct model (using ImageNet weights)
     inception = InceptionV3(weights="imagenet", include_top=False,
-                              input_shape=patches[0].shape)
+                            input_shape=patches[0].shape)
 
     # Isolate pre-softmax outputs
     x = inception.output
@@ -139,15 +171,14 @@ def extract_single():
     # Experimental - flatten to 1d
     if args.flatten or args.ext == 'csv':
         x = Flatten()(x)
-        # TODO: K.reshape(x) to 2d
-
 
     # Construct extractor model
     extractor = Model(inputs=[inception.input], outputs=[x])
 
     # Extract features with Model.predict()
     features = extractor.predict(x=patches, batch_size=2)
-    features = K.reshape(features, (72, 1024))
+    # TODO: K.reshape(x) to 2d
+    # features = K.reshape(features, (36, 2048))
     # TODO: get rid of zero-padding
 
     return features
@@ -173,6 +204,7 @@ def save_features():
     """
 
     extractor = args.extractor
+    features = []
 
     if extractor == 'multi':
         features = extract_multi()
@@ -195,11 +227,11 @@ def save_features():
     elif extension == "npy":  # god please don't actually do this
         outfile = "" + out_path
         np.save(file=outfile, allow_pickle=True, arr=features)
-    else:
+    elif extension == "csv":
         if compress:
             extension += ".gz"
         outfile = "" + out_path + "." + extension
-        np.savetxt(fname=outfile, X=features, fmt='%1.6f')
+        np.savetxt(fname=outfile, X=features, fmt='%1.5f')
     # TODO: (distant future) npz for the optional list of concat. 1d arrays
 
 args = collect_args()
