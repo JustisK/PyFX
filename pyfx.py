@@ -19,6 +19,8 @@ def collect_args():
     # Command line arguments: image in-path, feature out-path, extension for output
     parser = argparse.ArgumentParser(description='Perform InceptionV3-ImageNet feature extraction on images.')
 
+    # TODO: nargs, document these - explain each type
+    # TODO: case-insensitivity changes
     parser.add_argument(nargs='?', type=str, dest='img_path',
                         default='./images', action='store')
     parser.add_argument(nargs='?', type=str, dest='out_path',
@@ -27,9 +29,13 @@ def collect_args():
                         default='hdf5', action='store')
     parser.add_argument(nargs='?', type=bool, dest='compressed',
                         default=False, action='store')
+    parser.add_argument(nargs='?', type=str, dest='extractor',
+                        default='multi', action='store')
+
     argv = parser.parse_args()
     compressed = argv.compressed
     extension = argv.ext
+
     # TODO: put this warning somewhere else
     if extension != ("csv" or "txt"):
         print("""WARNING: non-text output (bin, npy, hdf5) is incompressible for now.
@@ -62,18 +68,18 @@ def extract_multi():
     patches = preprocess_input(np.array(patches))
 
     # Construct model (using ImageNet weights)
-    inceptionV3 = InceptionV3(weights="imagenet", include_top=False,
+    inception = InceptionV3(weights="imagenet", include_top=False,
                               input_shape=patches[0].shape)
 
     # Isolate pre-softmax outputs
-    x = inceptionV3.output
+    x = inception.output
 
     # Experimental - flatten to 2d for CSV
     if args.ext == "csv":
         x = Flatten()(x)
 
     # Construct extractor model
-    extractor = Model(inputs=[inceptionV3.input], outputs=[x])
+    extractor = Model(inputs=[inception.input], outputs=[x])
 
     # Extract features with Model.predict()
     features = extractor.predict(x=patches, batch_size=2)
@@ -98,32 +104,33 @@ def extract_single():
     :return: Keras tensor containing extracted features.
     """
 
-    # Load dataset (any image-based dataset)
-    target = image.load_image(args.img_path)
-    patches = extract_patches_2d(target)
+    # Load target image
+    target = skimage.io.imread(args.img_path).astype('float64')
+    # TODO: patch overlap
+    patches = extract_patches_2d(target, (256, 256))
 
-    # TODO: patch target --> patches[]
     """
-    patches = [skimage.transform.resize(  # resize image to (256, 256)
-        skimage.io.imread(os.path.join(path, match.group(1))),  # open each image
-        (256, 256)) for match, path in matches if match]
+    # Regularize to 256x256 TODO: allow different patch/resize dimensions parametrically
+    for patch in patches:
+        skimage.transform.resize(patch, (256, 256))
     """
+
     # Preprocess for InceptionV3
     patches = preprocess_input(np.array(patches))
 
     # Construct model (using ImageNet weights)
-    inceptionV3 = InceptionV3(weights="imagenet", include_top=False,
+    inception = InceptionV3(weights="imagenet", include_top=False,
                               input_shape=patches[0].shape)
 
     # Isolate pre-softmax outputs
-    x = inceptionV3.output
+    x = inception.output
 
     # Experimental - flatten to 2d for CSV
     if args.ext == "csv":
         x = Flatten()(x)
 
     # Construct extractor model
-    extractor = Model(inputs=[inceptionV3.input], outputs=[x])
+    extractor = Model(inputs=[inception.input], outputs=[x])
 
     # Extract features with Model.predict()
     features = extractor.predict(x=patches, batch_size=2)
@@ -145,18 +152,22 @@ def extract_single_1d():
     target = image.load_img(args.img_path)
 
 
-def save_features(*kwargs):
+def save_features():
     """
     Writes extracted feature vectors into a binary or text file, per args.
     :return: 
     """
-    features = extract_multi()
-    print(features.shape)  # comment out if you don't care to know output shape
-    if kwargs == 'multi':
+
+    extractor = args.extractor
+
+    if extractor == 'multi':
         features = extract_multi()
-    elif kwargs == 'single':
+    elif extractor == 'single':
         features = extract_single()
     # TODO: extract_1d
+
+    print(features.shape)  # comment out if you don't care to know output shape
+
     extension = str(args.ext)
     compressed = args.compressed
     out_path = str(args.out_path)
