@@ -10,29 +10,37 @@ from keras.preprocessing import image
 from keras.models import Model
 from keras.layers import Dropout, Flatten, Input
 
-# Command line arguments: image in-path, feature out-path, extension for output
-parser = argparse.ArgumentParser(description='Perform InceptionV3-ImageNet feature extraction on images.')
 
-parser.add_argument(nargs='?', type=str, dest='img_path',
-                    default='./images', action='store')
-parser.add_argument(nargs='?', type=str, dest='out_path',
-                    default='./output/features', action='store')
-parser.add_argument(nargs='?', type=str, dest='ext',
-                    default='hdf5', action='store')
-parser.add_argument(nargs='?', type=bool, dest='compressed',
-                    default=False, action='store')
-args = parser.parse_args()
+def arg_shit():
+    # Command line arguments: image in-path, feature out-path, extension for output
+    parser = argparse.ArgumentParser(description='Perform InceptionV3-ImageNet feature extraction on images.')
 
-# TODO: put this warning somewhere else
-if (args.ext != "csv") and args.compressed:
-    print("""WARNING: non-text output (bin, npy, hdf5) is incompressible for now.
-    \nOutput will not be compressed.""")
+    parser.add_argument(nargs='?', type=str, dest='img_path',
+                        default='./images', action='store')
+    parser.add_argument(nargs='?', type=str, dest='out_path',
+                        default='./output/features', action='store')
+    parser.add_argument(nargs='?', type=str, dest='ext',
+                        default='hdf5', action='store')
+    parser.add_argument(nargs='?', type=bool, dest='compressed',
+                        default=False, action='store')
+    argv = parser.parse_args()
+
+    # TODO: put this warning somewhere else
+    if argv.ext != ("csv" or "txt"):
+        print("""WARNING: non-text output (bin, npy, hdf5) is incompressible for now.
+        \nOutput will not be compressed.""")
+    elif not argv.compressed:
+        print("""WARNING: non-compressed csv output is extremely large.
+        Recommend re-running with compressed=True.""")
+    return argv
+
 
 """
 extract_multi
 
 Extracts feature data for each member in a directory containing .png images.
 """
+
 
 def extract_multi():
     # Load dataset (any image-based dataset)
@@ -85,6 +93,7 @@ extract_features.py as an alternative.
 def extract_single_1d():
     target = image.load_img(args.img_path)
 
+
 """
 extract_single
 
@@ -103,6 +112,7 @@ def save_features():
 
     extension = str(args.ext)
     compressed = args.compressed
+
     # TODO: figure out compression for file types other than txt/csv
     if extension == "hdf5":
         # (Recommended, default) save --> .hdf
@@ -112,11 +122,12 @@ def save_features():
         outfile = "" + str(args.out_path)
         np.save(file=outfile, allow_pickle=True, arr=features)
     else:
-        if args.compressed:
+        if compressed:
             extension += ".gz"
         outfile = "" + str(args.out_path) + "." + extension
         np.savetxt(fname=outfile, X=features, fmt='%1.6f')
     # TODO: (distant future) npz for the optional list of concat. 1d arrays
 
+args = arg_shit()
 save_features()
 import gc; gc.collect()
