@@ -25,6 +25,11 @@ def collect_args():
                         default='multi', action='store')
     parser.add_argument(nargs='?', type=str, dest='img_path',
                         default='./images', action='store')
+    """
+    # Need to figure out how to integrate this with regex.
+    parser.add_argument(nargs='?', type=str, dest='img_type',
+                        default='png', action='store')
+    """
     parser.add_argument(nargs='?', type=str, dest='out_path',
                         default='./output/features', action='store')
     parser.add_argument(nargs='?', type=str, dest='ext',
@@ -156,7 +161,7 @@ def extract_single_1d():
 def save_features():
     """
     Writes extracted feature vectors into a binary or text file, per args.
-    :return: 
+    :return: none
     """
 
     extractor = args.extractor
@@ -172,6 +177,7 @@ def save_features():
     extension = str(args.ext)
     compress = args.compressed
     out_path = str(args.out_path)
+
     # TODO: figure out compression for file types other than txt/csv
 
     if extension == "hdf5":
