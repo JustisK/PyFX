@@ -139,7 +139,6 @@ def extract_single():
     # Experimental - flatten to 1d
     if args.flatten or args.ext == 'csv':
         x = Flatten()(x)
-        # TODO: K.reshape(x) to 2d
 
 
     # Construct extractor model
@@ -147,7 +146,8 @@ def extract_single():
 
     # Extract features with Model.predict()
     features = extractor.predict(x=patches, batch_size=2)
-    features = K.reshape(features, (72, 1024))
+    # TODO: K.reshape(x) to 2d
+    # features = K.reshape(features, (72, 1024))
     # TODO: get rid of zero-padding
 
     return features
