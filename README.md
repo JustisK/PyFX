@@ -7,12 +7,13 @@ As a standard Python script, `PyFX` can be run from terminal or invoked using `s
 ### Arguments
 `PyFX` takes four arguments: 
  * the extractor target - `multi` (multiple images) or `single` (single image)
- * an input path (e.g. directory containing images (e.g.for `extract_multi`) or the address of a single image [for extract_single()]) - default is './images' 
+ * an input path (e.g. directory containing images (e.g.for `extract_multi`) or 
+ the address of a single image [for extract_single()]) - default is './images' 
  * an output path (e.g. directory and filename) - default is './output/features'
  * a **DOTLESS** file extension (e.g. `csv`, `txt`) for the stored features - default is `hdf5`
- * a Python-style boolean - `True` for compressed output, `False` for uncompressed - default is `True`
- *
- *
+ * boolean `True` for compressed output, `False` for uncompressed - default is `False`
+ * boolean `True` for flattened output, `False` for n-dimensional - default is `False`, 
+ except for `csv` output (2d)
  
 ### Usage notes
 As of now, the script uses an 'unsafe' implementation, assuming correct input format for the target images and command line arguments. When using `PyFX`:
