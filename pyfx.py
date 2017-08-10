@@ -117,8 +117,10 @@ def extract_single():
 
     """
     # Regularize to 256x256 TODO: allow different patch/resize dimensions parametrically
+    
     for patch in patches:
         skimage.transform.resize(patch, (256, 256))
+    
     """
 
     # Preprocess for InceptionV3
