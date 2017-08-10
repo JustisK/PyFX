@@ -82,6 +82,24 @@ def extract_multi():
     return features
 
 
+def extract_single():
+    """
+    extract_single
+
+    Returns feature data for a single image or patch. Does not concatenate
+    output to a 1d array, but instead outputs a full Keras tensor. The 
+    extraction is identical to extract_multi, but takes features from a 
+    single file rather than a directory of files.
+    
+    Those intending to use this method directly might consider libkeras's
+    extract_features.py as an alternative.
+    
+    :return: Keras tensor containing extracted features.
+    """
+
+    target = image.load_image(args.img_path)
+
+
 def extract_single_1d():
     """
     extract_single_1d
@@ -90,29 +108,9 @@ def extract_single_1d():
     method for an extract_multi() variant that returns 1d arrays of feature
     data for each member in a list of images - but, can be used explicitly.
 
-    Those intending to use this method directly might consider libkeras's
-    extract_features.py as an alternative.
-    
     :return: Numpy array of features, concatenated to one dimension.
     """
-    # TODO: check param, modify output
     target = image.load_img(args.img_path)
-
-
-def extract_single():
-    """
-    extract_single
-
-    Returns feature data for a single image or patch. Does not concatenate
-    output to a 1d array, but instead outputs a full Keras tensor.
-    
-    The extraction is identical to extract_multi, but takes features
-    from a single file rather than a directory of files.
-    
-    :return: Keras tensor containing extracted features.
-    """
-
-    target = image.load_image(args.img_path)
 
 
 def save_features():
@@ -127,6 +125,7 @@ def save_features():
     compressed = args.compressed
 
     # TODO: figure out compression for file types other than txt/csv
+
     if extension == "hdf5":
         # (Recommended, default) save --> .hdf
         f = h5py.File("" + str(args.out_path) + ".hdf5", "w")
