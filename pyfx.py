@@ -4,6 +4,7 @@ import h5py
 import skimage.io
 import skimage.transform
 from sklearn.feature_extraction.image import extract_patches_2d
+from keras import backend as K
 from keras.applications import InceptionV3
 from keras.applications.imagenet_utils import preprocess_input
 from keras.preprocessing import image
@@ -80,9 +81,10 @@ def extract_multi():
     # Isolate pre-softmax outputs
     x = inception.output
 
-    # Experimental - flatten to 1d for CSV
+    # Flatten to 1d
     if args.flatten or args.ext == 'csv':
         x = Flatten()(x)
+        # TODO: K.reshape(x) to 2d for csv
 
     # Construct extractor model
     extractor = Model(inputs=[inception.input], outputs=[x])
@@ -136,6 +138,7 @@ def extract_single():
     # Experimental - flatten to 1d
     if args.flatten or args.ext == 'csv':
         x = Flatten()(x)
+        # TODO: K.reshape(x) to 2d
 
     # Construct extractor model
     extractor = Model(inputs=[inception.input], outputs=[x])
