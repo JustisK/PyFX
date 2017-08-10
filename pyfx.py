@@ -1,5 +1,4 @@
-import os, re
-import argparse
+import os, re, gc, argparse
 import numpy as np
 import h5py
 import skimage.io
@@ -11,7 +10,7 @@ from keras.models import Model
 from keras.layers import Dropout, Flatten, Input
 
 
-def arg_shit():
+def collect_args():
     # Command line arguments: image in-path, feature out-path, extension for output
     parser = argparse.ArgumentParser(description='Perform InceptionV3-ImageNet feature extraction on images.')
 
@@ -108,7 +107,7 @@ def extract_single():
 
 def save_features():
     features = extract_multi()
-    print(features.shape) # comment out if you don't care to know output shape
+    print(features.shape)  # comment out if you don't care to know output shape
 
     extension = str(args.ext)
     compressed = args.compressed
@@ -128,6 +127,7 @@ def save_features():
         np.savetxt(fname=outfile, X=features, fmt='%1.6f')
     # TODO: (distant future) npz for the optional list of concat. 1d arrays
 
-args = arg_shit()
+args = collect_args()
 save_features()
-import gc; gc.collect()
+gc.collect()
+exit(0)
