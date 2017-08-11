@@ -17,7 +17,7 @@ copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
@@ -41,7 +41,7 @@ from keras.applications.imagenet_utils import preprocess_input
 from keras.preprocessing import image
 from keras.models import Model
 from keras.layers import Flatten
-from keras import backend as K
+# from keras import backend as K  #TODO: actually use K.reshape
 
 
 def collect_args():
@@ -49,13 +49,17 @@ def collect_args():
     Collects command line arguments from invocation.
     :return: argparse object containing parsed command line arguments
     """
-    # Command line arguments: image in-path, feature out-path, extension for output
-    parser = argparse.ArgumentParser(description='Perform InceptionV3-ImageNet feature extraction on images.')
+    # Command line arguments: image in-path, feature out-path, ext for output
+    parser = argparse.ArgumentParser(description="""Perform InceptionV3
+     feature extraction on images.""")
 
     # TODO: nargs, document these - explain each type
     # TODO: case-insensitivity changes
     parser.add_argument(nargs='?', type=str, dest='extractor',
                         default='multi', action='store')
+    # TODO: -silent (no prompting) w/ default=prompt for args
+    parser.add_argument(nargs=1, type=bool, dest='silent',
+                        default=True, action='store')
     parser.add_argument(nargs='?', type=str, dest='img_path',
                         default='./images', action='store')
     """
@@ -67,16 +71,21 @@ def collect_args():
                         default='./output/features', action='store')
     parser.add_argument(nargs='?', type=str, dest='ext',
                         default='hdf5', action='store')
+    """
+    TODO: figure out why this and other boolean args get set True
+    when defaults are False and False is passed to them in xterm.
+    """
     parser.add_argument(nargs='?', type=bool, dest='compressed',
                         default=False, action='store')
     parser.add_argument(nargs='?', type=bool, dest='flatten',
                         default=False, action='store')
     argv = parser.parse_args()
+
     compressed = argv.compressed
     extension = argv.ext
 
-    # TODO: put this warning somewhere else
     if extension != ("csv" or "txt"):
+        # TODO: string formatting here is bad
         print("""WARNING: non-text output (bin, npy, hdf5) is incompressible for now.
         \nOutput will not be compressed.""")
     elif not compressed:
@@ -89,8 +98,8 @@ def extract_multi():
     """
     extract_multi
 
-    Extracts feature data for each member in a directory containing .png images.
-    
+    Extracts feature data for each member in a directory containing .png images
+
     :return: Keras tensor containing extracted features.
     """
 
@@ -101,7 +110,7 @@ def extract_multi():
                for fname in files]
     # Resize / regularize image 'patches'
     patches = [skimage.transform.resize(  # resize image to (256, 256)
-        skimage.io.imread(os.path.join(path, match.group(1))),  # open each image
+        skimage.io.imread(os.path.join(path, match.group(1))),  # open each img
         (256, 256)) for match, path in matches if match]
 
     # Pre-process for InceptionV3
@@ -135,13 +144,13 @@ def extract_single():
     extract_single
 
     Returns feature data for a single image or patch. Does not concatenate
-    output to a 1d array, but instead outputs a full Keras tensor. The 
-    extraction is identical to extract_multi, but takes features from a 
+    output to a 1d array, but instead outputs a full Keras tensor. The
+    extraction is identical to extract_multi, but takes features from a
     single file rather than a directory of files.
-    
+
     Those intending to use this method directly might consider libkeras's
     extract_features.py as an alternative.
-    
+
     :return: Keras tensor containing extracted features.
     """
 
@@ -151,11 +160,12 @@ def extract_single():
     patches = extract_patches_2d(target, (256, 256))
 
     """
-    # Regularize to 256x256 TODO: allow different patch/resize dimensions parametrically
-    
+    # Regularize to 256x256
+    # TODO: allow different patch/resize dimensions parametrically
+
     for patch in patches:
         skimage.transform.resize(patch, (256, 256))
-    
+
     """
 
     # Pre-process for InceptionV3
@@ -177,9 +187,9 @@ def extract_single():
 
     # Extract features with Model.predict()
     features = extractor.predict(x=patches, batch_size=2)
-    # TODO: K.reshape(x) to 2d
+    # TODO (distant future): K.reshape(x) to 2d
     # features = K.reshape(features, (36, 2048))
-    # TODO: get rid of zero-padding
+    # TODO (distant future): get rid of zero-padding
 
     return features
 
@@ -195,6 +205,7 @@ def extract_single_1d():
     :return: Numpy array of features, concatenated to one dimension.
     """
     target = image.load_img(args.img_path)
+    return target
 
 
 def save_features():
@@ -221,20 +232,41 @@ def save_features():
     # TODO: figure out compression for file types other than txt/csv
 
     if extension == "hdf5":
-        # (Recommended, default) save --> .hdf
+        # (Recommended, default) save to .hdf5
         f = h5py.File("" + out_path + ".hdf5", "w")
         f.create_dataset(name=str(args.out_path), data=features)
     elif extension == "npy":  # god please don't actually do this
+        # Save to .npy binary (numpy) - incompressible (as of now)
         outfile = "" + out_path
         np.save(file=outfile, allow_pickle=True, arr=features)
     elif extension == "csv":
+        # Save to .csv (or, .csv.gz if args.compressed==True)
+        # This option is natively compressible.
         if compress:
             extension += ".gz"
         outfile = "" + out_path + "." + extension
         np.savetxt(fname=outfile, X=features, fmt='%1.5f')
     # TODO: (distant future) npz for the optional list of concat. 1d arrays
 
-args = collect_args()
-save_features()
-gc.collect()
-exit(0)
+
+def main():
+    """
+    Execute feature extraction.
+    :return: None. Should exit with code 0 on success.
+    """
+    save_features()
+    gc.collect()
+    exit(0)  # TODO: check - change exit code for failure
+
+
+def fill_args():
+    prompt = ""
+    return prompt
+
+
+# PROMPTS = {}  # TODO: put prompts here
+args = collect_args()  # TODO: get rid of global variables
+
+# TODO: add extractor option that passes out features in a string
+
+main()
