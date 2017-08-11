@@ -57,6 +57,9 @@ def collect_args():
     # TODO: case-insensitivity changes
     parser.add_argument(nargs='?', type=str, dest='extractor',
                         default='multi', action='store')
+    # TODO: -silent (no prompting) w/ default=prompt for args
+    parser.add_argument(nargs=1, type=bool, dest='silent',
+                        default=True, action='store')
     parser.add_argument(nargs='?', type=str, dest='img_path',
                         default='./images', action='store')
     """
@@ -68,17 +71,21 @@ def collect_args():
                         default='./output/features', action='store')
     parser.add_argument(nargs='?', type=str, dest='ext',
                         default='hdf5', action='store')
+    """
+    TODO: figure out why this and other boolean args get set True
+    when defaults are False and False is passed to them in xterm.
+    """
     parser.add_argument(nargs='?', type=bool, dest='compressed',
                         default=False, action='store')
     parser.add_argument(nargs='?', type=bool, dest='flatten',
                         default=False, action='store')
-    # TODO: -silent (no prompting) w/ default=prompt for args
     argv = parser.parse_args()
+
     compressed = argv.compressed
     extension = argv.ext
 
-    # TODO: put this warning somewhere else
     if extension != ("csv" or "txt"):
+        # TODO: string formatting here is bad
         print("""WARNING: non-text output (bin, npy, hdf5) is incompressible for now.
         \nOutput will not be compressed.""")
     elif not compressed:
@@ -180,9 +187,9 @@ def extract_single():
 
     # Extract features with Model.predict()
     features = extractor.predict(x=patches, batch_size=2)
-    # TODO: K.reshape(x) to 2d
+    # TODO (distant future): K.reshape(x) to 2d
     # features = K.reshape(features, (36, 2048))
-    # TODO: get rid of zero-padding
+    # TODO (distant future): get rid of zero-padding
 
     return features
 
