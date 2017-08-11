@@ -231,23 +231,25 @@ def save_features():
     out_path = str(args.out_path)
 
     # TODO: figure out compression for file types other than txt/csv
-
+    outfile = "" + out_path
+    out_full = outfile + "." + extension
     if extension == "hdf5":
         # (Recommended, default) save to .hdf5
         f = h5py.File("" + out_path + ".hdf5", "w")
         f.create_dataset(name=str(args.out_path), data=features)
-
-    elif extension == "npy":  # god please don't actually do this
-        # Save to .npy binary (numpy) - incompressible (as of now)
-        outfile = "" + out_path
-        np.save(file=outfile, allow_pickle=True, arr=features)
         if compress:
-            out_full = outfile + "." + extension
             with open(out_full) as f_in:
                 outfile_gz = out_full + ".gz"
                 with gzip.open(outfile_gz, 'wb') as f_out:
                     shutil.copyfileobj(f_in, f_out)
-
+    elif extension == "npy":  # god please don't actually do this
+        # Save to .npy binary (numpy) - incompressible (as of now)
+        np.save(file=outfile, allow_pickle=True, arr=features)
+        if compress:
+            with open(out_full) as f_in:
+                outfile_gz = out_full + ".gz"
+                with gzip.open(outfile_gz, 'wb') as f_out:
+                    shutil.copyfileobj(f_in, f_out)
     elif extension == "csv":
         # Save to .csv (or, .csv.gz if args.compressed==True)
         # This option is natively compressible.
