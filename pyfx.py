@@ -17,15 +17,7 @@ copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-<<<<<<< HEAD
 FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
-=======
-<<<<<<< HEAD
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-=======
-FITNESS FOR A PARTICULAR PURPOSE AND NON-INFRINGEMENT. IN NO EVENT SHALL THE
->>>>>>> ktj-dev
->>>>>>> 16e98fe6d6025a86f7979a4084c705ec4449ab4c
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
@@ -49,17 +41,8 @@ from keras.applications.imagenet_utils import preprocess_input
 from keras.preprocessing import image
 from keras.models import Model
 from keras.layers import Flatten
-<<<<<<< HEAD
 # from keras import backend as K  #TODO: actually use K.reshape
 
-=======
-<<<<<<< HEAD
-from keras import backend as K
-=======
-# from keras import backend as K  #TODO: actually use K.reshape
-
->>>>>>> ktj-dev
->>>>>>> 16e98fe6d6025a86f7979a4084c705ec4449ab4c
 
 def collect_args():
     """
@@ -204,21 +187,9 @@ def extract_single():
 
     # Extract features with Model.predict()
     features = extractor.predict(x=patches, batch_size=2)
-<<<<<<< HEAD
     # TODO (distant future): K.reshape(x) to 2d
     # features = K.reshape(features, (36, 2048))
     # TODO (distant future): get rid of zero-padding
-=======
-<<<<<<< HEAD
-    # TODO: K.reshape(x) to 2d
-    # features = K.reshape(features, (72, 1024))
-    # TODO: get rid of zero-padding
-=======
-    # TODO (distant future): K.reshape(x) to 2d
-    # features = K.reshape(features, (36, 2048))
-    # TODO (distant future): get rid of zero-padding
->>>>>>> ktj-dev
->>>>>>> 16e98fe6d6025a86f7979a4084c705ec4449ab4c
 
     return features
 
