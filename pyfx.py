@@ -252,7 +252,7 @@ def main():
     exit(0)  # TODO: check - change exit code for failure
 
 
-def prompt():
+def fill_args():
     prompt = ""
     return prompt
 
