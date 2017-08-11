@@ -5,7 +5,7 @@ Inception-based feature extraction for image-based datasets. Written in Python3.
 As a standard Python script, `PyFX` can be run from terminal or invoked using `system()` within C++ (or equivalent modes of shell interaction). 
 
 ### Arguments
-`PyFX` takes seven arguments: 
+`PyFX` takes seven (4+3) arguments: 
  * the extractor target - `multi` (multiple images) or `single` (single image)
  * a boolean value (bound to -s tag) for silent run (default is `True`)
  * an input path (e.g. directory containing images (e.g.for `extract_multi`) or 
