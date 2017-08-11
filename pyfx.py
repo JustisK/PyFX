@@ -41,7 +41,7 @@ from keras.applications.imagenet_utils import preprocess_input
 from keras.preprocessing import image
 from keras.models import Model
 from keras.layers import Flatten
-from keras import backend as K
+# from keras import backend as K  #TODO: actually use K.reshape
 
 
 def collect_args():
@@ -71,6 +71,7 @@ def collect_args():
                         default=False, action='store')
     parser.add_argument(nargs='?', type=bool, dest='flatten',
                         default=False, action='store')
+    # TODO: -silent (no prompting) w/ prompted default (should ask for missing args)
     argv = parser.parse_args()
     compressed = argv.compressed
     extension = argv.ext
@@ -221,20 +222,38 @@ def save_features():
     # TODO: figure out compression for file types other than txt/csv
 
     if extension == "hdf5":
-        # (Recommended, default) save --> .hdf
+        # (Recommended, default) save to .hdf5
         f = h5py.File("" + out_path + ".hdf5", "w")
         f.create_dataset(name=str(args.out_path), data=features)
     elif extension == "npy":  # god please don't actually do this
+        # Save to .npy binary (numpy) - incompressible (as of now)
         outfile = "" + out_path
         np.save(file=outfile, allow_pickle=True, arr=features)
     elif extension == "csv":
+        # Save to .csv (or, .csv.gz if args.compressed==True)
+        # This option is natively compressible.
         if compress:
             extension += ".gz"
         outfile = "" + out_path + "." + extension
         np.savetxt(fname=outfile, X=features, fmt='%1.5f')
     # TODO: (distant future) npz for the optional list of concat. 1d arrays
 
-args = collect_args()
-save_features()
-gc.collect()
-exit(0)
+
+def main():
+    """
+    Execute feature extraction.
+    :return: None. Should exit with code 0 on success.
+    """
+    save_features()
+    gc.collect()
+    exit(0)  # TODO: check - change exit code for failure
+
+def prompt():
+    prompt = ""
+
+PROMPTS = {}  # TODO: put prompts here
+args = collect_args()  # TODO: get rid of global variables
+
+# TODO: add extractor option that passes out features in a string
+
+main()
