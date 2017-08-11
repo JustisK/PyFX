@@ -49,8 +49,9 @@ def collect_args():
     Collects command line arguments from invocation.
     :return: argparse object containing parsed command line arguments
     """
-    # Command line arguments: image in-path, feature out-path, extension for output
-    parser = argparse.ArgumentParser(description='Perform InceptionV3-ImageNet feature extraction on images.')
+    # Command line arguments: image in-path, feature out-path, ext for output
+    parser = argparse.ArgumentParser(description="""Perform InceptionV3
+     feature extraction on images.""")
 
     # TODO: nargs, document these - explain each type
     # TODO: case-insensitivity changes
@@ -71,7 +72,7 @@ def collect_args():
                         default=False, action='store')
     parser.add_argument(nargs='?', type=bool, dest='flatten',
                         default=False, action='store')
-    # TODO: -silent (no prompting) w/ prompted default (should ask for missing args)
+    # TODO: -silent (no prompting) w/ default=prompt for args
     argv = parser.parse_args()
     compressed = argv.compressed
     extension = argv.ext
@@ -90,8 +91,8 @@ def extract_multi():
     """
     extract_multi
 
-    Extracts feature data for each member in a directory containing .png images.
-    
+    Extracts feature data for each member in a directory containing .png images
+
     :return: Keras tensor containing extracted features.
     """
 
@@ -102,7 +103,7 @@ def extract_multi():
                for fname in files]
     # Resize / regularize image 'patches'
     patches = [skimage.transform.resize(  # resize image to (256, 256)
-        skimage.io.imread(os.path.join(path, match.group(1))),  # open each image
+        skimage.io.imread(os.path.join(path, match.group(1))),  # open each img
         (256, 256)) for match, path in matches if match]
 
     # Pre-process for InceptionV3
@@ -136,13 +137,13 @@ def extract_single():
     extract_single
 
     Returns feature data for a single image or patch. Does not concatenate
-    output to a 1d array, but instead outputs a full Keras tensor. The 
-    extraction is identical to extract_multi, but takes features from a 
+    output to a 1d array, but instead outputs a full Keras tensor. The
+    extraction is identical to extract_multi, but takes features from a
     single file rather than a directory of files.
-    
+
     Those intending to use this method directly might consider libkeras's
     extract_features.py as an alternative.
-    
+
     :return: Keras tensor containing extracted features.
     """
 
@@ -152,11 +153,12 @@ def extract_single():
     patches = extract_patches_2d(target, (256, 256))
 
     """
-    # Regularize to 256x256 TODO: allow different patch/resize dimensions parametrically
-    
+    # Regularize to 256x256
+    # TODO: allow different patch/resize dimensions parametrically
+
     for patch in patches:
         skimage.transform.resize(patch, (256, 256))
-    
+
     """
 
     # Pre-process for InceptionV3
@@ -196,6 +198,7 @@ def extract_single_1d():
     :return: Numpy array of features, concatenated to one dimension.
     """
     target = image.load_img(args.img_path)
+    return target
 
 
 def save_features():
@@ -248,10 +251,13 @@ def main():
     gc.collect()
     exit(0)  # TODO: check - change exit code for failure
 
+
 def prompt():
     prompt = ""
+    return prompt
 
-PROMPTS = {}  # TODO: put prompts here
+
+# PROMPTS = {}  # TODO: put prompts here
 args = collect_args()  # TODO: get rid of global variables
 
 # TODO: add extractor option that passes out features in a string
