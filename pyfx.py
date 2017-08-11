@@ -87,8 +87,7 @@ def collect_args():
 
     if extension != ("csv" or "txt"):
         # TODO: string formatting here is bad
-        print("""WARNING: non-text output (bin, npy, hdf5) is incompressible for now.
-        \nOutput will not be compressed.""")
+        print("""WARNING: non-text compression is experimental.""")
     elif not compressed:
         print("""WARNING: non-compressed csv output is extremely large.
         Recommend re-running with compressed=True.""")
@@ -180,7 +179,7 @@ def extract_single():
     x = inception.output
 
     # Experimental - flatten to 1d
-    if args.flatten or args.ext == 'csv':
+    if (args.flatten or args.ext == 'csv') and args.ext != 'hdf5':
         x = Flatten()(x)
 
     # Construct extractor model
@@ -230,7 +229,7 @@ def save_features():
     compress = args.compressed
     out_path = str(args.out_path)
 
-    # TODO: figure out compression for file types other than txt/csv
+    # TODO: get rid of boilerplate code
     outfile = "" + out_path
     out_full = outfile + "." + extension
     if extension == "hdf5":
