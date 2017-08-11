@@ -27,6 +27,7 @@ SOFTWARE.
 import os
 import re
 import gc
+import gzip, shutil
 import argparse
 
 import numpy as np
@@ -223,7 +224,7 @@ def save_features():
         features = extract_single()
     # TODO: extract_1d
 
-    print("Output shape: " + features.shape)  # comment out if you don't care to know output shape
+    print("Output shape: ", features.shape)  # comment out if you don't care to know output shape
 
     extension = str(args.ext)
     compress = args.compressed
@@ -235,10 +236,18 @@ def save_features():
         # (Recommended, default) save to .hdf5
         f = h5py.File("" + out_path + ".hdf5", "w")
         f.create_dataset(name=str(args.out_path), data=features)
+
     elif extension == "npy":  # god please don't actually do this
         # Save to .npy binary (numpy) - incompressible (as of now)
         outfile = "" + out_path
         np.save(file=outfile, allow_pickle=True, arr=features)
+        if compress:
+            out_full = outfile + "." + extension
+            with open(out_full) as f_in:
+                outfile_gz = out_full + ".gz"
+                with gzip.open(outfile_gz, 'wb') as f_out:
+                    shutil.copyfileobj(f_in, f_out)
+
     elif extension == "csv":
         # Save to .csv (or, .csv.gz if args.compressed==True)
         # This option is natively compressible.
