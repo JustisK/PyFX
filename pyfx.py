@@ -223,7 +223,7 @@ def save_features():
         features = extract_single()
     # TODO: extract_1d
 
-    print(features.shape)  # comment out if you don't care to know output shape
+    print("Output shape: " + features.shape)  # comment out if you don't care to know output shape
 
     extension = str(args.ext)
     compress = args.compressed
