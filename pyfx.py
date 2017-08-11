@@ -43,6 +43,7 @@ from keras.models import Model
 from keras.layers import Flatten
 from keras import backend as K
 
+
 def collect_args():
     """
     Collects command line arguments from invocation.
@@ -177,7 +178,7 @@ def extract_single():
     # Extract features with Model.predict()
     features = extractor.predict(x=patches, batch_size=2)
     # TODO: K.reshape(x) to 2d
-    # features = K.reshape(features, (72, 1024))
+    # features = K.reshape(features, (36, 2048))
     # TODO: get rid of zero-padding
 
     return features
@@ -203,6 +204,7 @@ def save_features():
     """
 
     extractor = args.extractor
+    features = []
 
     if extractor == 'multi':
         features = extract_multi()
@@ -225,11 +227,11 @@ def save_features():
     elif extension == "npy":  # god please don't actually do this
         outfile = "" + out_path
         np.save(file=outfile, allow_pickle=True, arr=features)
-    else:
+    elif extension == "csv":
         if compress:
             extension += ".gz"
         outfile = "" + out_path + "." + extension
-        np.savetxt(fname=outfile, X=features, fmt='%1.6f')
+        np.savetxt(fname=outfile, X=features, fmt='%1.5f')
     # TODO: (distant future) npz for the optional list of concat. 1d arrays
 
 args = collect_args()
