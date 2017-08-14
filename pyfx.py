@@ -194,20 +194,6 @@ def extract_single():
     return features
 
 
-def extract_single_1d():
-    """
-    extract_single_1d
-
-    Returns feature data for a single image or patch. Intended as a helper
-    method for an extract_multi() variant that returns 1d arrays of feature
-    data for each member in a list of images - but, can be used explicitly.
-
-    :return: Numpy array of features, concatenated to one dimension.
-    """
-    target = image.load_img(args.img_path)
-    return target
-
-
 def save_features():
     """
     Writes extracted feature vectors into a binary or text file, per args.
@@ -269,12 +255,24 @@ def main():
     exit(0)  # TODO: check - change exit code for failure
 
 
-def fill_args():
+def prompt_for_args():
+    """
+    Prompt for missing command-line arguments.
+    :return: last prompted argument (string) from standard input.
+    """
+
+    # TODO: fill in prompts
+    prompts = {'flatten': '',    # output dimensionality (concat. to 1d)
+               'ext': '',        # output file type
+               'compress': '',   # compressed output
+               'silent': '',     # silent or verbose execution
+               'img_path': '',   # target directory
+               'out_path': '',   # output path (fname)
+               'extractor': ''}  # target configuration (multi/single image)
     prompt = ""
     return prompt
 
 
-# PROMPTS = {}  # TODO: put prompts here
 args = collect_args()  # TODO: get rid of global variables
 
 # TODO: add extractor option that passes out features in a string
