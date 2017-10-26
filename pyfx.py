@@ -207,9 +207,8 @@ def save_features():
         features = extract_multi()
     elif extractor == 'single':
         features = extract_single()
-    # TODO: extract_1d
 
-    print("Output shape: ", features.shape)  # comment out if you don't care to know output shape
+    # print("Output shape: ", features.shape)  # comment out if you don't care to know output shape
 
     extension = str(args.ext)
     compress = args.compressed
@@ -231,17 +230,24 @@ def save_features():
         # Save to .npy binary (numpy) - incompressible (as of now)
         np.save(file=outfile, allow_pickle=True, arr=features)
         if compress:
+
             with open(out_full) as f_in:
                 outfile_gz = out_full + ".gz"
+
                 with gzip.open(outfile_gz, 'wb') as f_out:
                     shutil.copyfileobj(f_in, f_out)
+
     elif extension == "csv":
+
         # Save to .csv (or, .csv.gz if args.compressed==True)
         # This option is natively compressible.
         if compress:
             extension += ".gz"
         outfile = "" + out_path + "." + extension
+
+        # TODO: This needs to return a string, no explicit save
         np.savetxt(fname=outfile, X=features, fmt='%1.5f')
+        return features
     # TODO: (distant future) npz for the optional list of concat. 1d arrays
 
 
@@ -253,24 +259,6 @@ def main():
     save_features()
     gc.collect()
     exit(0)  # TODO: check - change exit code for failure
-
-
-def prompt_for_args():
-    """
-    Prompt for missing command-line arguments.
-    :return: last prompted argument (string) from standard input.
-    """
-
-    # TODO: fill in prompts
-    prompts = {'flatten': '',    # output dimensionality (concat. to 1d)
-               'ext': '',        # output file type
-               'compress': '',   # compressed output
-               'silent': '',     # silent or verbose execution
-               'img_path': '',   # target directory
-               'out_path': '',   # output path (fname)
-               'extractor': ''}  # target configuration (multi/single image)
-    prompt = ""
-    return prompt
 
 
 args = collect_args()  # TODO: get rid of global variables
