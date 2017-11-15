@@ -1,3 +1,11 @@
+"""
+Use notes: currently supports extract_single only, pending a fix for
+argparse for extract_multi et al.
+
+Invoke as:
+python pyfx.py path-to-file.extension
+"""
+
 import os
 import re
 import gc
@@ -16,7 +24,6 @@ from keras.applications.imagenet_utils import preprocess_input
 from keras.preprocessing import image
 from keras.models import Model
 from keras.layers import Flatten
-# from keras import backend as K  #TODO: actually use K.reshape
 
 
 def collect_args():
@@ -29,33 +36,45 @@ def collect_args():
      feature extraction on images.""")
 
     # TODO: nargs, document these - explain each type
+    """
     # TODO: case-insensitivity changes
     parser.add_argument(nargs='?', type=str, dest='extractor',
                         default='multi', action='store')
     # TODO: -silent (no prompting) w/ default=prompt for args
     parser.add_argument(nargs=1, type=bool, dest='silent',
                         default=True, action='store')
+    """
     parser.add_argument(nargs='?', type=str, dest='img_path',
                         default='./images', action='store')
+
     """
     # Need to figure out how to integrate this with regex.
     parser.add_argument(nargs='?', type=str, dest='img_type',
                         default='png', action='store')
+    """
+
     """
     parser.add_argument(nargs='?', type=str, dest='out_path',
                         default='./output/features', action='store')
     parser.add_argument(nargs='?', type=str, dest='ext',
                         default='hdf5', action='store')
     """
+
+    """
     TODO: figure out why this and other boolean args get set True
     when defaults are False and False is passed to them in xterm.
+    """
+
     """
     parser.add_argument(nargs='?', type=bool, dest='compressed',
                         default=False, action='store')
     parser.add_argument(nargs='?', type=bool, dest='flatten',
                         default=False, action='store')
+    """
+
     argv = parser.parse_args()
 
+    """
     compressed = argv.compressed
     extension = argv.ext
 
@@ -65,6 +84,8 @@ def collect_args():
     elif not compressed:
         print("""WARNING: non-compressed csv output is extremely large.
         Recommend re-running with compressed=True.""")
+    """
+
     return argv
 
 
