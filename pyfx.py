@@ -134,7 +134,7 @@ def extract_multi():
     return features
 
 
-def extract_single():
+def extract_single(filename):
     """
     extract_single
 
@@ -149,19 +149,11 @@ def extract_single():
     :return: Keras tensor containing extracted features.
     """
 
-    # Load target image
-    target = skimage.io.imread(args.img_path).astype('float32')
-    # TODO: patch overlap
+    # Load target image (as float32)
+    target = skimage.io.imread(filename).astype('float32')
+
+    # Split into patches
     patches = extract_patches_2d(target, (256, 256))
-
-    """
-    # Regularize to 256x256
-    # TODO: allow different patch/resize dimensions parametrically
-
-    for patch in patches:
-        skimage.transform.resize(patch, (256, 256))
-
-    """
 
     # Pre-process for InceptionV3
     patches = preprocess_input(np.array(patches))
@@ -173,21 +165,16 @@ def extract_single():
     # Isolate pre-softmax outputs
     x = inception.output
 
-    # Experimental - flatten to 1d
-    if (args.flatten or args.ext == 'csv') and args.ext != 'hdf5':
-        x = Flatten()(x)
+    # Concat to 1d array
+    x = Flatten()(x)
 
     # Construct extractor model
     extractor = Model(inputs=[inception.input], outputs=[x])
 
     # Extract features with Model.predict()
     features = extractor.predict(x=patches, batch_size=2)
-    # TODO (distant future): K.reshape(x) to 2d
-    # features = K.reshape(features, (36, 2048))
-    # TODO (distant future): get rid of zero-padding
 
     return features
-
 
 def save_features():
     """
@@ -251,13 +238,11 @@ def main():
     Execute feature extraction.
     :return: None. Should exit with code 0 on success.
     """
-    save_features()
+    # Uncomment if you would like to save results to disk:
+    # save_features()
     gc.collect()
     exit(0)  # TODO: check - change exit code for failure
 
-
-args = collect_args()  # TODO: get rid of global variables
-
-# TODO: add extractor option that passes out features in a string
+args = collect_args()
 
 main()
